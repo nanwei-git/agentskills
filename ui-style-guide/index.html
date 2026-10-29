@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>界面风格规范 · Apple Liquid Glass（暗色）</title>
+<style>
+  :root{
+    /* 背景 */
+    --bg:#000; --bg-2:#1C1C1E; --bg-3:#2C2C2E;
+    --fill:rgba(120,120,128,.36); --fill-2:rgba(120,120,128,.24);
+    --separator:rgba(84,84,88,.65);
+    /* 文字 */
+    --ink:rgba(255,255,255,.92); --ink-2:rgba(235,235,245,.60);
+    --ink-3:rgba(235,235,245,.30); --ink-4:rgba(235,235,245,.18);
+    /* 强调 / 语义 */
+    --accent:#0A84FF; --accent-press:#0A7BEA;
+    --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --yellow:#FFD60A; --teal:#40C8E0;
+    /* 玻璃材质 */
+    --glass-fill:rgba(255,255,255,.09);
+    --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+    --glass-blur:blur(30px) saturate(180%);
+    --hairline:rgba(255,255,255,.14);
+    --shadow:0 10px 30px -10px rgba(0,0,0,.55), 0 2px 8px -4px rgba(0,0,0,.35);
+    /* 形状 */
+    --r-btn:12px; --r-card:16px; --r-panel:24px; --r-sheet:28px; --r-cap:999px;
+    /* 字体 */
+    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    /* 动效 */
+    --ease-sheet:cubic-bezier(.32,.72,0,1); --ease-std:cubic-bezier(.4,0,.2,1);
+    --ease-out:cubic-bezier(0,0,.2,1); --ease-in:cubic-bezier(.4,0,1,1);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; min-height:100vh; color:var(--ink);
+    font-family:var(--font); font-size:17px; line-height:1.55;
+    letter-spacing:-.008em; -webkit-font-smoothing:antialiased;
+    background:var(--bg);
+  }
+
+  /* 壁纸层 */
+  .wallpaper{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 18% -10%, #16233a 0%, transparent 58%),
+      radial-gradient(100% 80% at 92% 18%,  #1d1a2e 0%, transparent 62%),
+      radial-gradient(120% 100% at 50% 112%, #101c1e 0%, transparent 60%),
+      #000;
+  }
+  .wallpaper::after{
+    content:""; position:absolute; inset:0; opacity:.035;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  }
+
+  /* 玻璃材质 */
+  .glass{
+    position:relative; border-radius:var(--r-card);
+    background:var(--glass-sheen), var(--glass-fill);
+    backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    border:.5px solid var(--hairline);
+    box-shadow:inset 0 .5px 0 rgba(255,255,255,.26), inset 0 -.5px 0 rgba(255,255,255,.06), var(--shadow);
+  }
+  .glass::before{
+    content:""; position:absolute; inset:0; padding:.5px; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,.08) 38%,rgba(255,255,255,.02) 68%,rgba(255,255,255,.20));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+  }
+  .glass::after{
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:radial-gradient(140% 70% at 50% -32%, rgba(255,255,255,.20), transparent 55%);
+  }
+  .glass > *{position:relative; z-index:1;}
+
+  /* 布局 */
+  .layout{display:flex; gap:24px; max-width:min(1140px,92vw); margin:0 auto; padding:24px 0 80px;}
+  .sidebar{
+    position:sticky; top:24px; align-self:flex-start; width:248px; flex:0 0 248px;
+    padding:18px; max-height:calc(100vh - 48px); overflow:auto;
+  }
+  .sidebar h4{margin:0 0 12px; font-size:13px; font-weight:600; color:var(--ink-3); letter-spacing:0;}
+  .sidebar a{
+    display:block; padding:8px 12px; margin:2px 0; border-radius:10px;
+    color:var(--ink-2); text-decoration:none; font-size:14px; transition:background .2s var(--ease-out),color .2s var(--ease-out);
+  }
+  .sidebar a:hover{background:var(--fill-2); color:var(--ink);}
+  .sidebar a.active{background:rgba(10,132,255,.18); color:var(--accent);}
+
+  .main{flex:1 1 auto; min-width:0;}
+  .hero{padding:40px 32px; margin-bottom:24px;}
+  .hero h1{margin:0 0 12px; font-size:34px; font-weight:700; letter-spacing:-.022em;}
+  .hero p{margin:0; color:var(--ink-2); font-size:17px;}
+  .hero .chip{margin-top:16px;}
+
+  section.card{padding:24px 28px; margin-bottom:16px; scroll-margin-top:24px;}
+  section.card h2{margin:0 0 16px; font-size:28px; font-weight:700; letter-spacing:-.018em;}
+  section.card h3{margin:24px 0 10px; font-size:20px; font-weight:600; letter-spacing:-.014em;}
+  section.card p{color:var(--ink); margin:10px 0;}
+  section.card ul{margin:10px 0; padding-left:20px; color:var(--ink);}
+  section.card li{margin:6px 0;}
+
+  /* 表格 */
+  .table-wrap{margin:14px 0; border-radius:14px; overflow:hidden; border:.5px solid var(--hairline);}
+  table{width:100%; border-collapse:collapse; font-size:14px;}
+  th,td{padding:10px 14px; text-align:left; vertical-align:top; border-bottom:.5px solid var(--separator);}
+  thead th{background:rgba(255,255,255,.06); color:var(--ink); font-weight:600; font-size:13px; letter-spacing:0;}
+  tbody tr:last-child td{border-bottom:none;}
+  td code,th code{font-family:var(--mono); font-size:12.5px; color:var(--teal);}
+  .mono{font-family:var(--mono); font-size:13px;}
+
+  /* 代码块 */
+  pre{
+    margin:14px 0; padding:16px 18px; border-radius:14px; overflow:auto;
+    background:rgba(28,28,30,.92); border:.5px solid var(--hairline);
+    font-family:var(--mono); font-size:12.5px; line-height:1.55; color:rgba(235,235,245,.85);
+  }
+  pre code{font-family:inherit;}
+
+  /* 色板 */
+  .swatches{display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; margin:14px 0;}
+  .sw{display:flex; flex-direction:column; gap:8px; padding:10px; border-radius:12px; background:rgba(255,255,255,.05);}
+  .sw .dot{height:36px; border-radius:10px; border:.5px solid var(--hairline);}
+  .sw .lbl{font-size:12px; color:var(--ink-2);}
+  .sw .val{font-family:var(--mono); font-size:11px; color:var(--ink-3);}
+
+  /* chip / badge */
+  .chip{display:inline-block; font-size:13px; color:var(--ink-2); background:var(--fill-2); padding:4px 12px; border-radius:var(--r-cap); letter-spacing:0;}
+  .badge-ok{display:inline-block; font-size:13px; color:#fff; background:var(--accent); padding:3px 12px; border-radius:var(--r-cap); font-weight:600;}
+
+  /* 组件演示 */
+  .demo{display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin:14px 0;}
+  .btn{height:40px; padding:0 18px; border-radius:var(--r-btn); font-size:17px; font-weight:600; display:inline-flex; align-items:center; cursor:pointer; border:none; transition:transform .15s var(--ease-out),filter .15s var(--ease-out);}
+  .btn:active{transform:scale(.97);}
+  .btn.filled{background:var(--accent); color:#fff;}
+  .btn.filled:active{filter:brightness(.92);}
+  .btn.tinted{background:rgba(10,132,255,.18); color:var(--accent);}
+  .btn.glass{background:var(--glass-sheen),var(--glass-fill); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border:.5px solid var(--hairline); color:var(--ink);}
+
+  .switch{width:51px; height:31px; border-radius:999px; background:var(--fill); position:relative; transition:background .25s var(--ease-sheet);}
+  .switch.on{background:var(--green);}
+  .switch .thumb{position:absolute; top:1.5px; left:1.5px; width:28px; height:28px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:left .25s var(--ease-sheet);}
+  .switch.on .thumb{left:21.5px;}
+
+  .segmented{display:inline-flex; background:var(--fill); border-radius:999px; padding:3px; gap:3px;}
+  .segmented span{padding:6px 16px; border-radius:999px; font-size:14px; color:var(--ink-2);}
+  .segmented span.sel{background:var(--accent); color:#fff;}
+
+  .list-demo{border-radius:14px; overflow:hidden; border:.5px solid var(--hairline);}
+  .list-demo .row{display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:.5px solid var(--separator); font-size:15px;}
+  .list-demo .row:last-child{border-bottom:none;}
+  .list-demo .row .v{color:var(--ink-2);}
+
+  /* 自审清单 */
+  .check{border-radius:14px; padding:8px 4px;}
+  .check label{display:flex; align-items:flex-start; gap:10px; padding:8px 12px; font-size:15px; color:var(--ink); cursor:default;}
+  .check .box{flex:0 0 20px; width:20px; height:20px; border-radius:6px; border:.5px solid var(--hairline); margin-top:2px; display:inline-flex; align-items:center; justify-content:center; font-size:13px; color:var(--accent);}
+
+  .footer{text-align:center; color:var(--ink-3); font-size:13px; padding:32px 0;}
+
+  /* 响应式 */
+  @media (max-width:744px){
+    .layout{flex-direction:column; padding:16px 0 60px;}
+    .sidebar{position:static; width:auto; flex:none; max-height:none; display:flex; flex-wrap:wrap; gap:4px;}
+    .sidebar h4{width:100%;}
+    .sidebar a{padding:6px 10px; font-size:13px;}
+    .hero{padding:28px 20px;}
+    .hero h1{font-size:28px;}
+    section.card{padding:20px 18px;}
+    section.card h2{font-size:22px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{scroll-behavior:auto !important; transition:none !important; animation:none !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wallpaper"></div>
+
+<div class="layout">
+  <aside class="sidebar glass">
+    <h4>目录</h4>
+    <a href="#s0">0 · 覆盖声明</a>
+    <a href="#s1">1 · 设计调性</a>
+    <a href="#s2">2 · 壁纸层</a>
+    <a href="#s3">3 · 色彩系统</a>
+    <a href="#s4">4 · 玻璃材质</a>
+    <a href="#s5">5 · 排版</a>
+    <a href="#s6">6 · 形状与间距</a>
+    <a href="#s7">7 · 组件规范</a>
+    <a href="#s8">8 · 动效</a>
+    <a href="#s9">9 · 无障碍</a>
+    <a href="#s10">10 · 响应式</a>
+    <a href="#s11">11 · 统一 Token</a>
+    <a href="#s12">12 · 迁移映射</a>
+    <a href="#s13">13 · 自审清单</a>
+    <a href="#s14">14 · 总纲</a>
+  </aside>
+
+  <main class="main">
+    <header class="hero glass">
+      <h1>界面风格规范 · Apple Liquid Glass（暗色）</h1>
+      <p>适用范围：<span class="mono">E:\webwork\vibe</span>（Three.js 手势粒子 + 控制台）与 <span class="mono">E:\webwork\web_work</span>（课堂作业索引站）。视觉目标：iOS 26 Liquid Glass。</p>
+      <div><span class="chip">液态玻璃</span> <span class="chip">折射亮环</span> <span class="chip">镜面高光</span> <span class="chip">连续圆角</span> <span class="chip">8pt 栅格</span></div>
+    </header>
+
+    <section id="s0" class="card glass">
+      <h2>0 · 设计系统覆盖声明（Brand Override）</h2>
+      <p>本规范以 <strong>Apple Human Interface Guidelines / Liquid Glass</strong> 为真实设计系统约束，因此<strong>显式覆盖</strong> <code>ui-design</code> skill 中的以下通用禁令：</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>通用禁令</th><th>本项目处理</th><th>理由</th></tr></thead>
+        <tbody>
+          <tr><td>禁止 <code>system-ui</code> / <code>-apple-system</code> 字体</td><td><strong>允许且强制</strong></td><td>SF Pro 是 Apple 设计系统的本体，无法替代为第三方字体</td></tr>
+          <tr><td>禁止紫/靛/紫罗兰渐变</td><td><strong>禁止保留</strong></td><td>苹果风只保留单一系统蓝 <code>#0A84FF</code>，旧规范的粉紫 <code>#ff9ad8</code> 全面移除</td></tr>
+          <tr><td>禁止居中对称布局</td><td>分场景</td><td>Apple 官网式 hero 允许居中；控制台/列表沿用 Apple 左对齐 + 8pt 栅格</td></tr>
+          <tr><td>禁止 emoji 图标</td><td><strong>保留禁令</strong></td><td>统一使用 Lucide / Heroicons（SF Symbols 的 Web 近似）</td></tr>
+        </tbody>
+      </table></div>
+      <p>覆盖范围仅限上述四项，其余禁令（无 emoji 图标、明确美学方向、先出设计规范后写代码）依然生效。</p>
+    </section>
+
+    <section id="s1" class="card glass">
+      <h2>1 · 设计调性（Design Tone）</h2>
+      <p><strong>Apple HIG 三原则：</strong></p>
+      <ul>
+        <li><strong>Clarity 清晰</strong>：文字在任何材质上都保持高对比；层级靠字号/字重/灰度，不靠颜色数量。</li>
+        <li><strong>Deference 遵从</strong>：界面退让于内容。装饰（阴影、边框、高光）只服务于层级，不喧宾夺主。</li>
+        <li><strong>Depth 纵深</strong>：玻璃材质堆叠出真实物理层次——越靠前的材质越亮、模糊越强、阴影越深。</li>
+      </ul>
+      <p><strong>关键词</strong>：Liquid Glass、Specular highlight、Refraction edge、Hairline、Continuous corner、Neutral shadow、Spring motion。</p>
+      <h3>反模式（立即停止）</h3>
+      <ul>
+        <li>❌ 彩色 <code>box-shadow</code> 发光（如 <code>rgba(80,140,255,.65)</code>）</li>
+        <li>❌ 彩虹渐变标题 / clip-text 渐变文字</li>
+        <li>❌ 三团偏心彩色光晕（蓝 + 紫 + 青）</li>
+        <li>❌ 全大写 + 字距 <code>.14em</code> 的科技徽章</li>
+        <li>❌ 纯黑实体面板（无模糊、无材质）</li>
+        <li>❌ 生硬线性过渡（<code>linear</code> 或无缓动）</li>
+      </ul>
+    </section>
+
+    <section id="s2" class="card glass">
+      <h2>2 · 背景：壁纸层（Wallpaper Layer）</h2>
+      <p>Liquid Glass 的折射必须建立在<strong>有内容的背景</strong>上。纯黑底上的玻璃是死的。这是与旧规范最本质的差别。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>层</th><th>规则</th></tr></thead>
+        <tbody>
+          <tr><td>基色</td><td><code>#000000</code>（Apple 深色系统背景就是纯黑）</td></tr>
+          <tr><td>壁纸渐变</td><td>2–3 团<strong>极低饱和</strong>深色氛围，明度 ≤ <code>L 22%</code>，例：<code>#16233a</code>、<code>#1d1a2e</code>、<code>#101c1e</code></td></tr>
+          <tr><td>尺度</td><td>大半径 <code>radial-gradient(120% 90% at 20% 0%)</code>，<code>background-attachment: fixed</code></td></tr>
+          <tr><td>颗粒</td><td>叠加 2–4% 不透明度噪点，消除渐变色带（banding）</td></tr>
+          <tr><td>禁止</td><td>高饱和色块、青/粉/紫亮色光晕、多色同时出现（最多 2 个低饱和色相）</td></tr>
+        </tbody>
+      </table></div>
+      <pre><code>.wallpaper{
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 18% -10%, #16233a 0%, transparent 58%),
+    radial-gradient(100% 80% at 92% 18%,  #1d1a2e 0%, transparent 62%),
+    radial-gradient(120% 100% at 50% 112%, #101c1e 0%, transparent 60%),
+    #000;
+}
+.wallpaper::after{                 /* 颗粒 */
+  content:""; position:absolute; inset:0; opacity:.035;
+  background-image:url("data:image/svg+xml;utf8,&lt;svg ... &gt;");
+}</code></pre>
+    </section>
+
+    <section id="s3" class="card glass">
+      <h2>3 · 色彩系统（Color）</h2>
+      <h3>3.1 材质填充（Materials）</h3>
+      <p>Apple 深色材质在 Web 上的近似：<strong>白透明叠层 + backdrop-filter</strong>，四档厚度。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>材质</th><th>填充</th><th>backdrop-filter</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>Ultra Thin</td><td><code>rgba(255,255,255,.04)</code></td><td><code>blur(20px) saturate(160%)</code></td><td>大卡内层、列表分组条</td></tr>
+          <tr><td>Thin</td><td><code>rgba(255,255,255,.06)</code></td><td><code>blur(24px) saturate(170%)</code></td><td>卡片</td></tr>
+          <tr><td><strong>Regular（默认）</strong></td><td><code>rgba(255,255,255,.09)</code></td><td><code>blur(30px) saturate(180%)</code></td><td>面板、弹层</td></tr>
+          <tr><td>Thick</td><td><code>rgba(255,255,255,.13)</code></td><td><code>blur(40px) saturate(190%)</code></td><td>导航栏、Tab Bar、Sheet</td></tr>
+          <tr><td>Bar / Chrome</td><td><code>rgba(22,22,24,.72)</code></td><td><code>blur(30px) saturate(180%)</code></td><td>顶栏、底栏</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>3.2 / 3.3 系统灰阶与文字层级</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Token</th><th>值</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>--bg</code></td><td><code>#000000</code></td><td>页面底</td></tr>
+          <tr><td><code>--bg-2</code></td><td><code>#1C1C1E</code></td><td>分组底、输入框填充</td></tr>
+          <tr><td><code>--ink</code></td><td><code>rgba(255,255,255,.92)</code></td><td>label</td></tr>
+          <tr><td><code>--ink-2</code></td><td><code>rgba(235,235,245,.60)</code></td><td>secondaryLabel</td></tr>
+          <tr><td><code>--ink-3</code></td><td><code>rgba(235,235,245,.30)</code></td><td>tertiaryLabel</td></tr>
+          <tr><td><code>--separator</code></td><td><code>rgba(84,84,88,.65)</code></td><td>发丝分隔线</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>3.4 强调色与语义色（Apple System Colors · Dark）</h3>
+      <p><strong>主强调色只有一个：iOS 蓝。</strong></p>
+      <div class="swatches">
+        <div class="sw"><div class="dot" style="background:#0A84FF"></div><div class="lbl">Accent / Blue</div><div class="val">#0A84FF</div></div>
+        <div class="sw"><div class="dot" style="background:#30D158"></div><div class="lbl">Green</div><div class="val">#30D158</div></div>
+        <div class="sw"><div class="dot" style="background:#FF453A"></div><div class="lbl">Red</div><div class="val">#FF453A</div></div>
+        <div class="sw"><div class="dot" style="background:#FF9F0A"></div><div class="lbl">Orange</div><div class="val">#FF9F0A</div></div>
+        <div class="sw"><div class="dot" style="background:#FFD60A"></div><div class="lbl">Yellow</div><div class="val">#FFD60A</div></div>
+        <div class="sw"><div class="dot" style="background:#40C8E0"></div><div class="lbl">Teal</div><div class="val">#40C8E0</div></div>
+      </div>
+      <p><strong>规则</strong>：一屏之内强调色只出现 1–2 处（主行动点 + 当前选中）。状态指示点用「单色 + 极轻中性阴影」，<strong>不用彩色外发光</strong>。</p>
+    </section>
+
+    <section id="s4" class="card glass">
+      <h2>4 · 玻璃材质规范（核心）</h2>
+      <h3>4.1 三段式构成</h3>
+      <p>一张 Liquid Glass 表面 = <strong>折射亮环 + 镜面高光 + 中性投影</strong>，缺一不可。</p>
+      <pre><code>.glass{
+  position:relative; border-radius:var(--r-card);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.035)) ,
+    var(--glass-fill);
+  backdrop-filter:blur(30px) saturate(180%);
+  -webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:.5px solid rgba(255,255,255,.14);
+  box-shadow:
+    inset 0  .5px 0 rgba(255,255,255,.26),
+    inset 0 -.5px 0 rgba(255,255,255,.06),
+    0 10px 30px -10px rgba(0,0,0,.55),
+    0  2px  8px  -4px rgba(0,0,0,.35);
+}</code></pre>
+      <h3>4.2 连续圆角（Squircle）</h3>
+      <pre><code>:root{ --r-card:16px; }
+@supports (corner-shape: superellipse(2)){
+  .glass,.card,.btn,.sheet{ corner-shape:superellipse(2); }
+}</code></pre>
+      <h3>4.3 降级与兼容</h3>
+      <pre><code>@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .glass{ background:rgba(28,28,30,.92); }
+}</code></pre>
+    </section>
+
+    <section id="s5" class="card glass">
+      <h2>5 · 排版（Typography）</h2>
+      <p><strong>字体栈（SF Pro 优先，中文回退苹方）：</strong></p>
+      <pre><code>--font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+        "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;</code></pre>
+      <div class="table-wrap"><table>
+        <thead><tr><th>样式</th><th>字号 / 字重</th><th>字距</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>Large Title</td><td>34px / 700</td><td>-.022em</td><td>页面主标题</td></tr>
+          <tr><td>Title 1</td><td>28px / 700</td><td>-.018em</td><td>分区标题</td></tr>
+          <tr><td>Title 2</td><td>22px / 700</td><td>-.016em</td><td>卡片组标题</td></tr>
+          <tr><td>Title 3</td><td>20px / 600</td><td>-.014em</td><td>面板标题</td></tr>
+          <tr><td>Headline</td><td>17px / 600</td><td>-.012em</td><td>强调正文、按钮</td></tr>
+          <tr><td>Body</td><td>17px / 400</td><td>-.008em</td><td>正文</td></tr>
+          <tr><td>Footnote</td><td>13px / 400</td><td>0</td><td>注释、元信息</td></tr>
+          <tr><td>Caption</td><td>12px / 400</td><td>0</td><td>最小标注</td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>规则</strong>：字号越大字距越紧（负字距）；<strong>禁止渐变文字</strong>；<strong>禁止全大写宽字距徽章</strong>；等宽字体仅用于数值、路径、代码。</p>
+    </section>
+
+    <section id="s6" class="card glass">
+      <h2>6 · 形状与间距（Shape &amp; Spacing）</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>维度</th><th>取值</th></tr></thead>
+        <tbody>
+          <tr><td>间距栅格</td><td><strong>8pt</strong>：4 / 8 / 12 / 16 / 24 / 32 / 48</td></tr>
+          <tr><td>圆角 · 按钮</td><td>8–12px（胶囊按钮 = <code>height/2</code>）</td></tr>
+          <tr><td>圆角 · 卡片</td><td>14–18px</td></tr>
+          <tr><td>圆角 · 面板/弹层</td><td>22–28px</td></tr>
+          <tr><td>控件高度</td><td>输入框/按钮 36–44px，iOS 触控目标 <strong>≥ 44×44</strong></td></tr>
+          <tr><td>分隔线</td><td><strong>0.5px</strong> 发丝线，与文字左对齐内缩</td></tr>
+          <tr><td>容器宽</td><td><code>min(1140px, 92vw)</code></td></tr>
+          <tr><td>网格</td><td><code>repeat(auto-fill, minmax(272px, 1fr))</code>，gap <strong>16px</strong></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="s7" class="card glass">
+      <h2>7 · 组件规范（Components）</h2>
+      <h3>7.1–7.10 关键规范</h3>
+      <ul>
+        <li><strong>卡片 .card</strong>：玻璃 Regular + 发丝边 + 16px 圆角；hover <code>scale(1.015)</code>，press <code>scale(.985)</code>。</li>
+        <li><strong>按钮三档</strong>：Filled（实底 <code>#0A84FF</code>）、Tinted（蓝 18% 填充）、Glass/Plain。</li>
+        <li><strong>分段控件 .segmented</strong>：胶囊玻璃底 + 内部滑块，spring 切换。</li>
+        <li><strong>开关 .switch</strong>：51×31px，开启 <code>#30D158</code>，thumb 28px 纯白。</li>
+        <li><strong>滑块 .slider</strong>：4px 胶囊轨道，thumb 28px 白圆，<strong>无外发光</strong>。</li>
+        <li><strong>列表 .list</strong>：Inset Grouped，圆角玻璃卡 + 0.5px 发丝线，行高 44px。</li>
+        <li><strong>标签 .chip</strong>：13px Footnote、<code>--ink-2</code>、<code>--fill-2</code>、胶囊、无字距。</li>
+        <li><strong>导航栏 / Tab Bar</strong>：Thick 材质，处理 <code>env(safe-area-inset-bottom)</code>。</li>
+        <li><strong>弹层 .sheet</strong>：22–28px 圆角，Thick 材质，底部上推 <code>.5s</code>。</li>
+        <li><strong>图标</strong>：统一 Lucide / Heroicons，<code>stroke-width:1.75</code>，无 emoji。</li>
+      </ul>
+      <h3>实时演示</h3>
+      <div class="demo">
+        <button class="btn filled">Filled</button>
+        <button class="btn tinted">Tinted</button>
+        <button class="btn glass">Glass</button>
+        <div class="switch on"><div class="thumb"></div></div>
+        <div class="segmented"><span class="sel">Day</span><span>Week</span><span>Month</span></div>
+      </div>
+      <div class="list-demo glass">
+        <div class="row"><span>外观</span><span class="v">深色</span></div>
+        <div class="row"><span>强调色</span><span class="v">#0A84FF</span></div>
+        <div class="row"><span>动态效果</span><span class="v">开启</span></div>
+      </div>
+    </section>
+
+    <section id="s8" class="card glass">
+      <h2>8 · 动效（Motion）</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Token</th><th>值</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>--ease-sheet</code></td><td><code>cubic-bezier(.32,.72,0,1)</code></td><td>Sheet / 大转场</td></tr>
+          <tr><td><code>--ease-std</code></td><td><code>cubic-bezier(.4,0,.2,1)</code></td><td>通用进出</td></tr>
+          <tr><td><code>--ease-out</code></td><td><code>cubic-bezier(0,0,.2,1)</code></td><td>入场、展开</td></tr>
+          <tr><td><code>--ease-in</code></td><td><code>cubic-bezier(.4,0,1,1)</code></td><td>退场、收起</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>时长：微交互 <code>.15–.25s</code>；控件 <code>.25s</code>；转场 <code>.35–.5s</code>；Sheet <code>.5s</code>。</li>
+        <li>hover：<code>scale(1.015)</code> + 高光位移；press：<code>scale(.97)</code> + <code>brightness(.94)</code>。</li>
+        <li>状态点：静态单色，活跃时 1.6s spring 极轻缩放，<strong>不做呼吸闪烁</strong>。</li>
+        <li><strong>必须支持</strong> <code>prefers-reduced-motion: reduce</code> → 关闭位移与缩放。</li>
+      </ul>
+    </section>
+
+    <section id="s9" class="card glass">
+      <h2>9 · 无障碍（Accessibility）</h2>
+      <ul>
+        <li>正文对比度 ≥ <strong>4.5:1</strong>，大字 ≥ 3:1；必要时提高材质不透明度。</li>
+        <li>触控目标 ≥ <strong>44×44px</strong>。</li>
+        <li>分隔线、边框不得作为唯一的信息载体。</li>
+        <li>焦点可见：<code>:focus-visible</code> 用 <code>2px #0A84FF</code> 外环 + 2px offset。</li>
+      </ul>
+    </section>
+
+    <section id="s10" class="card glass">
+      <h2>10 · 响应式（Responsive）</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>断点</th><th>行为</th></tr></thead>
+        <tbody>
+          <tr><td>≥ 1024px</td><td>容器 <code>min(1140px,92vw)</code>，网格 ≥ 3 列</td></tr>
+          <tr><td>744–1023px</td><td>网格 2 列，侧栏收起</td></tr>
+          <tr><td>&lt; 744px</td><td>单列；hero 内边距降至 24px；大标题降至 28px</td></tr>
+        </tbody>
+      </table></div>
+      <p>vibe 控制台原 <code>≤720px</code>、web_work 原 <code>≤560px</code> 断点统一改为 <strong>744px / 560px</strong> 两级。</p>
+    </section>
+
+    <section id="s11" class="card glass">
+      <h2>11 · 统一 Token（:root，两项目共用）</h2>
+      <pre><code>:root{
+  --bg:#000; --bg-2:#1C1C1E; --bg-3:#2C2C2E;
+  --fill:rgba(120,120,128,.36); --fill-2:rgba(120,120,128,.24);
+  --separator:rgba(84,84,88,.65);
+  --ink:rgba(255,255,255,.92); --ink-2:rgba(235,235,245,.60);
+  --ink-3:rgba(235,235,245,.30); --ink-4:rgba(235,235,245,.18);
+  --accent:#0A84FF; --accent-press:#0A7BEA;
+  --green:#30D158; --red:#FF453A; --orange:#FF9F0A; --yellow:#FFD60A; --teal:#40C8E0;
+  --glass-fill:rgba(255,255,255,.09);
+  --glass-sheen:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035));
+  --glass-blur:blur(30px) saturate(180%);
+  --hairline:rgba(255,255,255,.14); --specular:rgba(255,255,255,.20);
+  --shadow:0 10px 30px -10px rgba(0,0,0,.55), 0 2px 8px -4px rgba(0,0,0,.35);
+  --r-btn:12px; --r-card:16px; --r-panel:24px; --r-sheet:28px; --r-cap:999px;
+  --ease-sheet:cubic-bezier(.32,.72,0,1); --ease-std:cubic-bezier(.4,0,.2,1);
+  --ease-out:cubic-bezier(0,0,.2,1); --ease-in:cubic-bezier(.4,0,1,1);
+}</code></pre>
+    </section>
+
+    <section id="s12" class="card glass">
+      <h2>12 · 迁移映射（旧规范 → Liquid Glass）</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>项目</th><th>旧值</th><th>新值</th></tr></thead>
+        <tbody>
+          <tr><td>主背景</td><td><code>#04050a</code> / <code>#070912</code></td><td><code>#000</code> + 低饱和壁纸层</td></tr>
+          <tr><td>彩色光晕</td><td>蓝/紫/青</td><td>删除；低饱和深灰蓝，最多 2 色相</td></tr>
+          <tr><td>玻璃填充</td><td>斜向渐变</td><td><code>--glass-fill</code> + <code>--glass-sheen</code> 垂直渐变</td></tr>
+          <tr><td>模糊</td><td><code>blur(14~24px)</code></td><td><code>blur(30px) saturate(180%)</code></td></tr>
+          <tr><td>强调色</td><td>三色渐变 + <code>#ff9ad8</code></td><td>单一 <code>#0A84FF</code></td></tr>
+          <tr><td>渐变标题</td><td>彩虹 clip-text</td><td>纯色 <code>--ink</code></td></tr>
+          <tr><td>字体</td><td>Outfit / Segoe UI</td><td>SF Pro 栈</td></tr>
+          <tr><td>hover</td><td><code>translateY(-5px)</code> + 发光</td><td><code>scale(1.015)</code> + 高光位移</td></tr>
+          <tr><td>圆角</td><td>卡片 16–20</td><td>按钮 8–12 / 卡片 14–18 / 面板 22–28</td></tr>
+          <tr><td>间距</td><td>18px gap</td><td>8pt 栅格：gap 16px</td></tr>
+          <tr><td>断点</td><td>720 / 560</td><td>1024 / 744 / 560</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="s13" class="card glass">
+      <h2>13 · 自审清单（交付前逐条过）</h2>
+      <div class="check">
+        <label><span class="box">✓</span> 页面内彩色发光 <code>box-shadow</code> 数量为 <strong>0</strong></label>
+        <label><span class="box">✓</span> 渐变文字数量为 <strong>0</strong>；标题为纯色</label>
+        <label><span class="box">✓</span> 强调色（<code>#0A84FF</code>）单一，一屏出现 ≤ 2 处</label>
+        <label><span class="box">✓</span> 玻璃元素同时具备：模糊 + 折射亮环 + 发丝内高光 + 中性阴影</label>
+        <label><span class="box">✓</span> 所有圆角走 token，大容器尝试 <code>corner-shape: superellipse(2)</code></label>
+        <label><span class="box">✓</span> 字体栈以 <code>-apple-system</code> / SF Pro 开头</label>
+        <label><span class="box">✓</span> 间距全部是 8 的倍数</label>
+        <label><span class="box">✓</span> 图标来自单一图标库，无 emoji</label>
+        <label><span class="box">✓</span> 动效使用 §8 曲线之一，且支持 <code>prefers-reduced-motion</code></label>
+        <label><span class="box">✓</span> 正文对比度 ≥ 4.5:1，触控目标 ≥ 44px</label>
+      </div>
+    </section>
+
+    <section id="s14" class="card glass">
+      <h2>14 · 一句话总纲</h2>
+      <p style="font-size:20px; font-weight:600; letter-spacing:-.014em; line-height:1.5;">
+        <strong>纯黑壁纸底 + 低饱和氛围层 + 液态玻璃材质（大模糊 + 折射亮环 + 镜面高光 + 发丝边）+ 单一 iOS 蓝强调 + 连续圆角 + 8pt 栅格 + 弹簧动效</strong> —— 层次来自光与材质，不来自颜色与发光。
+      </p>
+    </section>
+
+    <div class="footer">Apple Liquid Glass（暗色）界面风格规范 · 本页即规范本身的实现演示</div>
+  </main>
+</div>
+
+<script>
+  // 侧栏高亮当前章节
+  const links = Array.from(document.querySelectorAll('.sidebar a'));
+  const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = map.get(e.target.id);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('section.card').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
